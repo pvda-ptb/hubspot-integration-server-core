@@ -1,0 +1,30 @@
+[project]
+name = "hubspot_integration_server"
+version = "0.1.0"
+description = "A server for integrating with HubSpot using Flask and Celery"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Framework :: Flask",
+]
+dependencies = [
+    "flask",
+    "flask-sqlalchemy",
+    "python-dotenv",
+    "hubspot-api-client-extended",
+    "redis",
+    "celery",
+    "alembic",
+]
+
+[project.urls]
+Homepage = "https://example.com/project-url"

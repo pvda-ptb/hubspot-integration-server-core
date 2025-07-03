@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+python-dotenv
+hubspot-api-client-extended
+redis
+celery
+alembic
