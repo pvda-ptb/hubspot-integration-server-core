@@ -6,13 +6,12 @@ import logging
 
 from flask import request, abort
 
-from .config import HubspotIntegrationConfig
 
 # Set up a logger instance
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def validate_hubspot_signature(config: HubspotIntegrationConfig):
+def validate_hubspot_signature(config: dict):
     """Decorator to validate HubSpot signatures on Flask routes.
 
     The decorator uses the Signature utility to ensure that incoming requests
@@ -45,7 +44,7 @@ def validate_hubspot_signature(config: HubspotIntegrationConfig):
                 # Validate the signature using Signature utility
                 if not Signature.is_valid(
                     signature=request_signature,
-                    client_secret=config.hubspot_client_secret,
+                    client_secret=config['HUBSPOT_CLIENT_SECRET'],
                     request_body=request_body,
                     http_uri=request_uri,
                     http_method=request_method,

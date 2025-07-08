@@ -2,7 +2,6 @@ import logging
 from hubspot import OAuthClient
 from sqlalchemy.orm.exc import NoResultFound
 
-from ...config import HubspotIntegrationConfig
 from ...database import db
 from ...models import HubspotCredentials
 
@@ -10,7 +9,7 @@ from ...models import HubspotCredentials
 logger = logging.getLogger(__name__)
 
 class HubspotPortalService:
-    def __init__(self, config: HubspotIntegrationConfig):
+    def __init__(self, config: dict):
         """Initializes the HubspotPortalService with the given configuration."""
         self.config = config
 
@@ -30,8 +29,8 @@ class HubspotPortalService:
 
         try:
             hubspot_client = OAuthClient(
-                client_id=self.config.hubspot_client_id,
-                client_secret=self.config.hubspot_client_secret,
+                client_id=self.config['HUBSPOT_CLIENT_ID'],
+                client_secret=self.config['HUBSPOT_CLIENT_SECRET'],
                 refresh_token=credentials.hubspot_refresh_token,
                 access_token=credentials.hubspot_access_token,
                 portal_id=credentials.hubspot_portal_id,

@@ -3,15 +3,14 @@ import logging
 from typing import Type
 from flask import Flask
 
-from .config import HubspotIntegrationConfig
 from .database import db
-from .utils import validate_hubspot_signature
 from .oauth_server import OAuthServer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Set logging level to debug
 
-class HubspotIntegrationServer:
+
+class HubspotIntegrationServer(Flask):
     """
     Core server class for integrating with HubSpot.
 
@@ -20,7 +19,7 @@ class HubspotIntegrationServer:
 
     def __init__(
             self,
-            config: HubspotIntegrationConfig,
+            config: dict,
             oauth_server_class: Type[OAuthServer] = OAuthServer,
     ):
         """
@@ -29,7 +28,16 @@ class HubspotIntegrationServer:
         :param config: The configuration object for HubSpot integration.
         :param oauth_server_class: Class reference for OAuth server initialization.
         """
-        self.config = config
+        root_path = os.getenv('FLASK_BASE_PATH', os.getcwd())
+        instance_path=os.path.join(root_path, os.getenv('FLASK_INSTANCE_PATH', 'instance'))
+        template_folder=os.path.join(root_path, os.getenv('FLASK_TEMPLATE_FOLDER', 'templates'))
+        super().__init__(
+            __name__,
+            root_path=root_path,
+            instance_path=instance_path,
+            template_folder=template_folder,
+        )
+        self.config.update(config)
         self._oauth_server_class = oauth_server_class
 
         try:
@@ -40,36 +48,22 @@ class HubspotIntegrationServer:
 
     def _initialize_services(self):
         """
-        Initializes the core services: Flask app, SQLAlchemy, and OAuth server.
+        Initializes the core services: SQLAlchemy and OAuth server.
 
         Each initialization step includes error handling and logging.
         """
         try:
-            # Initialize Flask app
-            self.app = Flask(
-                __name__,
-                root_path=self.config.flask_base_path,
-                template_folder=os.path.join(self.config.flask_base_path, self.config.flask_template_folder),
-                instance_path=os.path.join(self.config.flask_base_path, self.config.flask_instance_path),
-            )
-            logger.debug("Flask app initialized.")
-        except Exception as e:
-            logger.exception(f"Failed to initialize Flask app: {e}")
-            raise
-
-        try:
             # Initialize SQLAlchemy
-            self.app.config['SQLALCHEMY_DATABASE_URI'] = self.config.database_uri
-            self.app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-            db.init_app(self.app)
-            logger.debug("SQLAlchemy initialized with URI: %s", self.config.database_uri)
+            self.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+            db.init_app(self)
+            logger.debug("SQLAlchemy initialized with URI: %s", self.config['SQLALCHEMY_DATABASE_URI'])
         except Exception as e:
             logger.exception(f"Failed to initialize SQLAlchemy: {e}")
             raise
 
         try:
             # Initialize OAuth server
-            self.oauth_server = self._oauth_server_class(self.app, self.config)
+            self.oauth_server = self._oauth_server_class(self, self.config)
             logger.debug("OAuth server initialized.")
         except Exception as e:
             logger.exception(f"Failed to initialize OAuth server: {e}")

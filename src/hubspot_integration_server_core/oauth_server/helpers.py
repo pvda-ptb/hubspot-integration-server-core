@@ -18,9 +18,9 @@ def default_oauth_process(code, api_client, config):
         # Obtain tokens using the authorization code
         tokens = api_client.oauth.tokens_api.create(
             grant_type="authorization_code",
-            redirect_uri=config.hubspot_oauth_redirect_url,
-            client_id=config.hubspot_client_id,
-            client_secret=config.hubspot_client_secret,
+            redirect_uri=config['HUBSPOT_OAUTH_REDIRECT_URL'],
+            client_id=config['HUBSPOT_CLIENT_ID'],
+            client_secret=config['HUBSPOT_CLIENT_SECRET'],
             code=code
         )
         logger.debug("Received tokens from HubSpot: %s", tokens)

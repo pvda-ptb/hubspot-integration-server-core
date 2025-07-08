@@ -1,7 +1,6 @@
 import logging
 from hubspot import Client
 
-from ...config import HubspotIntegrationConfig
 
 # Initialize a logger for this module
 logger = logging.getLogger(__name__)
@@ -35,7 +34,7 @@ class HubspotAppService:
     specified configuration.
     """
 
-    def __init__(self, config: HubspotIntegrationConfig):
+    def __init__(self, config: dict):
         """
         Initializes the HubspotAppService with the given configuration.
 
@@ -53,11 +52,11 @@ class HubspotAppService:
         """
         try:
             hubspot_client = Client(
-                client_id=self.config.hubspot_client_id,
-                client_secret=self.config.hubspot_client_secret,
+                client_id=self.config['HUBSPOT_CLIENT_ID'],
+                client_secret=self.config['HUBSPOT_CLIENT_SECRET'],
                 api_key={
-                    'developer_hapikey': self.config.hubspot_developer_hapikey,
-                    'app_id': self.config.hubspot_app_id,
+                    'developer_hapikey': self.config['HUBSPOT_DEVELOPER_HAPIKEY'],
+                    'app_id': self.config['HUBSPOT_APP_ID'],
                 },
                 api_factory=_custom_api_factory,
             )
