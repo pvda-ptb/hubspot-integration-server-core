@@ -1,6 +1,8 @@
 import os
 import logging
 from typing import Type
+
+from celery import Celery
 from flask import Flask
 
 from .database import db
@@ -48,17 +50,38 @@ class HubspotIntegrationServer(Flask):
 
     def _initialize_services(self):
         """
-        Initializes the core services: SQLAlchemy and OAuth server.
-
-        Each initialization step includes error handling and logging.
+        Initializes the core services: SQLAlchemy, Celery and OAuth server.
         """
         try:
             # Initialize SQLAlchemy
             self.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
             db.init_app(self)
             logger.debug("SQLAlchemy initialized with URI: %s", self.config['SQLALCHEMY_DATABASE_URI'])
+            # Create all tables by SQLAlchemy
+            with self.app_context():
+                db.create_all()
+            logger.debug("Database tables created.")
         except Exception as e:
             logger.exception(f"Failed to initialize SQLAlchemy: {e}")
+            raise
+
+        try:
+            # Initialize Celery if configured
+            if 'CELERY_BROKER_URL' in self.config:
+                self.celery = Celery(
+                    self.import_name,
+                    broker=self.config['CELERY_BROKER_URL'],
+                    backend=self.config['CELERY_RESULT_BACKEND'],
+                )
+                self.celery.conf.update(self.config)
+                # Automatically discover and register tasks from all files named tasks.py
+                # in your project.
+                self.celery.autodiscover_tasks()
+                logger.debug("Celery initialized.")
+            else:
+                logger.debug("Celery is not configured.")
+        except Exception as e:
+            logger.exception(f"Failed to initialize Celery: {e}")
             raise
 
         try:
