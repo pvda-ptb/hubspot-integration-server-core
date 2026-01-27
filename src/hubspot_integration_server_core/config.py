@@ -18,13 +18,10 @@ def load_configuration():
         'HUBSPOT_OAUTH_REDIRECT_URL': os.getenv('HUBSPOT_OAUTH_REDIRECT_URL'),
         'HUBSPOT_DEVELOPER_HAPIKEY': os.getenv('HUBSPOT_DEVELOPER_HAPIKEY'),
         'HUBSPOT_APP_ID': os.getenv('HUBSPOT_APP_ID'),
-        'HUBSPOT_RATE_LIMIT': os.getenv('HUBSPOT_RATE_LIMIT'),
+        'SQLALCHEMY_DATABASE_URI': os.getenv('SQLALCHEMY_DATABASE_URI'),
         'FLASK_BASE_PATH': os.getcwd(),
         'FLASK_TEMPLATE_FOLDER': 'templates',
         'FLASK_INSTANCE_PATH': 'instance',
-        'SQLALCHEMY_DATABASE_URI': os.getenv('SQLALCHEMY_DATABASE_URI'),
-        'CELERY_BROKER_URL': os.getenv('CELERY_BROKER_URL'),
-        'CELERY_RESULT_BACKEND': os.getenv('CELERY_RESULT_BACKEND'),
     }
 
     # Log critical values
